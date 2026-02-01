@@ -1,7 +1,9 @@
 "use client";
 
 import React from "react";
-import { BACKGROUNDS, BgId } from "@/lib/backgrounds";
+
+// IMPORTANT: use RELATIVE import (works on Vercel/Linux)
+import { BACKGROUNDS, BgId } from "../lib/backgrounds";
 
 export default function BackgroundPicker({
   value,
@@ -37,14 +39,14 @@ export default function BackgroundPicker({
               cursor: "pointer",
               height: 64,
             }}
-            title={String(b.id)}
-            aria-label={`Background ${b.id}`}
+            title={`Background ${String(b.id)}`}
+            aria-label={`Background ${String(b.id)}`}
           >
             <div
               style={{
                 width: "100%",
                 height: "100%",
-                backgroundImage: `url('${b.src}')`,
+                backgroundImage: `url(${b.src})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
