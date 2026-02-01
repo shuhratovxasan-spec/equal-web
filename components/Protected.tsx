@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { usePathname, useRouter } from "next/navigation";
 
-// ✅ Use RELATIVE import to avoid alias issues on Vercel
+// IMPORTANT: use RELATIVE import (works on Vercel/Linux)
 import { auth } from "../lib/firebase";
 
 export default function Protected({
@@ -14,25 +14,32 @@ export default function Protected({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
+      // If user is NOT logged in -> redirect to /{lang}/auth
       if (!user) {
-        // detect language from url: /ru/... or /en/...
         const parts = (pathname || "").split("/").filter(Boolean);
+
+        // Detect language prefix: /ru/... or /en/... (default en)
         const lang = parts[0] === "ru" ? "ru" : "en";
+
         router.replace(`/${lang}/auth`);
         return;
       }
 
+      // User logged in
       setReady(true);
     });
 
     return () => unsub();
   }, [router, pathname]);
 
-  if (!ready) return <div style={{ padding: 24 }}>Loading...</div>;
+  if (!ready) {
+    return <div style={{ padding: 24 }}>Loading...</div>;
+  }
+
   return <>{children}</>;
 }
-
