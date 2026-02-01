@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth } from "../lib/firebase";
 import { useRouter, usePathname } from "next/navigation";
 
 export default function Protected({ children }: { children: React.ReactNode }) {
@@ -27,3 +27,4 @@ export default function Protected({ children }: { children: React.ReactNode }) {
   if (!ready) return <div style={{ padding: 24 }}>Loading…</div>;
   return <>{children}</>;
 }
+
