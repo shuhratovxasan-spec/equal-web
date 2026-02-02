@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-
-// ✅ Vercel/Linux safe: relative import from /components -> /lib
 import { BACKGROUNDS, BgId } from "../lib/backgrounds";
 
 export default function BackgroundPicker({
@@ -39,8 +37,9 @@ export default function BackgroundPicker({
               cursor: "pointer",
               height: 64,
             }}
-            title={`Background ${String(b.id)}`}         // ✅ no b.label
-            aria-label={`Background ${String(b.id)}`}    // ✅ no b.label
+            // ✅ no b.label anymore
+            title={`Background ${String(b.id)}`}
+            aria-label={`Background ${String(b.id)}`}
           >
             <div
               style={{
@@ -57,5 +56,3 @@ export default function BackgroundPicker({
     </div>
   );
 }
-
-
