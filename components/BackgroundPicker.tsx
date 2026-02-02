@@ -2,7 +2,8 @@
 
 import React from "react";
 
-// IMPORTANT: use RELATIVE import (works on Vercel/Linux)
+// ✅ IMPORTANT: relative import (Vercel/Linux safe)
+// components/BackgroundPicker.tsx -> lib/backgrounds.ts
 import { BACKGROUNDS, BgId } from "../lib/backgrounds";
 
 export default function BackgroundPicker({
@@ -31,7 +32,10 @@ export default function BackgroundPicker({
             onClick={() => onChange(b.id)}
             type="button"
             style={{
-              border: b.id === value ? "2px solid #fff" : "1px solid rgba(255,255,255,0.35)",
+              border:
+                b.id === value
+                  ? "2px solid #fff"
+                  : "1px solid rgba(255,255,255,0.35)",
               borderRadius: 12,
               overflow: "hidden",
               padding: 0,
@@ -39,6 +43,7 @@ export default function BackgroundPicker({
               cursor: "pointer",
               height: 64,
             }}
+            // ✅ FIX: no b.label in your type
             title={`Background ${String(b.id)}`}
             aria-label={`Background ${String(b.id)}`}
           >
