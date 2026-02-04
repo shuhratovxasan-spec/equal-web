@@ -9,7 +9,7 @@ export const BACKGROUNDS = [
   { id: "bg6", src: "/backgrounds/bg6.png", label: "Background 6" },
 ] as const;
 
-export type BgId = (typeof BACKGROUNDS)[number]["id"];
 export type Background = (typeof BACKGROUNDS)[number];
+export type BgId = Background["id"];
 
 export const DEFAULT_BG: BgId = "bg1";
