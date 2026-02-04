@@ -39,9 +39,8 @@ export default function BackgroundPicker({
               cursor: "pointer",
               height: 64,
             }}
-title={`Background ${String(b.id)}`}
-aria-label={`Background ${String(b.id)}`}
-
+              title={`Background ${String(b.id)}`}
+              aria-label={`Background ${String(b.id)}`}
           >
             <div
               style={{
