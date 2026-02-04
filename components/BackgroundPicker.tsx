@@ -37,9 +37,8 @@ export default function BackgroundPicker({
               cursor: "pointer",
               height: 64,
             }}
-            // ✅ no b.label anymore
-            title={`Background ${String(b.id)}`}
-            aria-label={`Background ${String(b.id)}`}
+            title={b.label ?? `Background ${String(b.id)}`}
+            aria-label={b.label ?? `Background ${String(b.id)}`}
           >
             <div
               style={{
