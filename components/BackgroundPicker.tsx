@@ -29,7 +29,10 @@ export default function BackgroundPicker({
             onClick={() => onChange(b.id)}
             type="button"
             style={{
-              border: b.id === value ? "2px solid #fff" : "1px solid rgba(255,255,255,0.35)",
+              border:
+                b.id === value
+                  ? "2px solid #fff"
+                  : "1px solid rgba(255,255,255,0.35)",
               borderRadius: 12,
               overflow: "hidden",
               padding: 0,
@@ -37,8 +40,8 @@ export default function BackgroundPicker({
               cursor: "pointer",
               height: 64,
             }}
-            title={b.label ?? `Background ${String(b.id)}`}
-            aria-label={b.label ?? `Background ${String(b.id)}`}
+            title={b.label}
+            aria-label={`Background ${b.label}`}
           >
             <div
               style={{
