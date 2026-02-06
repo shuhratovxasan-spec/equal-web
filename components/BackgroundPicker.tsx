@@ -22,39 +22,41 @@ export default function BackgroundPicker({
           gap: 10,
         }}
       >
-        {BACKGROUNDS.map((b) => (
-          <button
-            key={b.id}
-            type="button"
-            onClick={() => onChange(b.id)}
-            style={{
-              border:
-                b.id === value
-                  ? "2px solid #fff"
-                  : "1px solid rgba(255,255,255,0.35)",
-              borderRadius: 12,
-              overflow: "hidden",
-              padding: 0,
-              background: "transparent",
-              cursor: "pointer",
-              height: 64,
-            }}
-            title={b.label}
-            aria-label={b.label}
-          >
-            <div
+        {BACKGROUNDS.map((b) => {
+          const isSelected = b.id === value;
+
+          return (
+            <button
+              key={b.id}
+              type="button"
+              onClick={() => onChange(b.id)}
+              title={b.label}
+              aria-label={b.label}
               style={{
-                width: "100%",
-                height: "100%",
-                backgroundImage: `url(${b.src})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
+                border: isSelected
+                  ? "2px solid #ffffff"
+                  : "1px solid rgba(255, 255, 255, 0.35)",
+                borderRadius: 12,
+                overflow: "hidden",
+                padding: 0,
+                background: "transparent",
+                cursor: "pointer",
+                height: 64,
               }}
-            />
-          </button>
-        ))}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  backgroundImage: `url(${b.src})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
+            </button>
+          );
+        })}
       </div>
     </div>
   );
 }
-
