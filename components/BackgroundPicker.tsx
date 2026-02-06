@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { BACKGROUNDS, type BgId } from "../lib/backgrounds";
 
 export default function BackgroundPicker({
@@ -28,10 +29,7 @@ export default function BackgroundPicker({
             type="button"
             onClick={() => onChange(b.id)}
             style={{
-              border:
-                b.id === value
-                  ? "2px solid #fff"
-                  : "1px solid rgba(255,255,255,0.35)",
+              border: b.id === value ? "2px solid #fff" : "1px solid rgba(255,255,255,0.35)",
               borderRadius: 12,
               overflow: "hidden",
               padding: 0,
