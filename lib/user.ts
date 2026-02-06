@@ -1,6 +1,7 @@
 // lib/users.ts
 import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+export async function getUserProfile(...) { ... }
 
 export type PublicUser = {
   uid: string;
@@ -62,3 +63,4 @@ export async function listUsersBySkill(skill: string, max = 50) {
     };
   });
 }
+
