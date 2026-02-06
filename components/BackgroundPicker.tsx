@@ -1,6 +1,5 @@
 "use client";
 
-import { BACKGROUNDS, type BgId } from "../lib/backgrounds";
 
 export default function BackgroundPicker({
   value,
