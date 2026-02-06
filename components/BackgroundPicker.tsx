@@ -3,48 +3,55 @@
 import React from "react";
 import { BACKGROUNDS, type BgId } from "../lib/backgrounds";
 
-type Props = {
+export default function BackgroundPicker({
+  value,
+  onChange,
+}: {
   value: BgId;
-  onChange: (id: BgId) => void;
-};
-
-export default function BackgroundPicker({ value, onChange }: Props) {
+  onChange: (bgId: BgId) => void;
+}) {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-        gap: 10,
-      }}
-    >
-      {BACKGROUNDS.map((b) => (
-        <button
-          key={b.id}
-          type="button"
-          onClick={() => onChange(b.id)}
-          title={b.label}
-          aria-label={b.label}
-          style={{
-            border: b.id === value ? "2px solid #fff" : "1px solid rgba(255,255,255,0.35)",
-            borderRadius: 12,
-            overflow: "hidden",
-            padding: 0,
-            background: "transparent",
-            cursor: "pointer",
-            height: 64,
-          }}
-        >
-          <div
+    <div style={{ marginTop: 14 }}>
+      <div style={{ fontSize: 12, opacity: 0.8, marginBottom: 8 }}>
+        Choose cover
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 10,
+        }}
+      >
+        {BACKGROUNDS.map((b) => (
+          <button
+            key={b.id}
+            type="button"
+            onClick={() => onChange(b.id)}
             style={{
-              width: "100%",
-              height: "100%",
-              backgroundImage: `url(${b.src})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
+              border: b.id === value ? "2px solid #fff" : "1px solid rgba(255,255,255,0.35)",
+              borderRadius: 12,
+              overflow: "hidden",
+              padding: 0,
+              background: "transparent",
+              cursor: "pointer",
+              height: 64,
             }}
-          />
-        </button>
-      ))}
+            title={b.label}
+            aria-label={b.label}
+          >
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                backgroundImage: `url(${b.src})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            />
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
