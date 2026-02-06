@@ -32,13 +32,7 @@ export default function BackgroundPicker({
               type="button"
               onClick={() => onChange(b.id)}
              
-              style={{
-                border: isSelected
-                  ? "2px solid #ffffff"
-                  : "1px solid rgba(255,255,255,0.35)",
-                borderRadius: 12,
-                overflow: "hidden",
-                padding: 0,
+
                 background: "transparent",
                 cursor: "pointer",
                 height: 64,
