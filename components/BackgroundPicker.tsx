@@ -31,6 +31,8 @@ export default function BackgroundPicker({
               key={b.id}
               type="button"
               onClick={() => onChange(b.id)}
+              title={label}
+              aria-label={label}
               style={{
                 border: isSelected
                   ? "2px solid #ffffff"
