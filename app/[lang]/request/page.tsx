@@ -1,14 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Protected from "@/components/Protected";
 import { auth } from "@/lib/firebase";
-import { acceptRequest, listenOpenRequests, HelpRequest } from "@/lib/request";
-import { getOrCreateChat } from "@/lib/chat";
+import { getUserProfile } from "@/lib/users";
+import { createRequest } from "@/lib/request";
 
-export default function RequestsPage() {
+export default function NewRequestPage() {
   const router = useRouter();
   const params = useParams();
   const lang = (params?.lang === "ru" ? "ru" : "en") as "ru" | "en";
@@ -16,111 +15,113 @@ export default function RequestsPage() {
   const t = useMemo(() => {
     return lang === "ru"
       ? {
-          title: "Запросы помощи",
-          new: "Создать запрос",
-          accept: "Принять",
-          openChat: "Открыть чат",
-          mine: "Это ваш запрос",
-          empty: "Пока нет открытых запросов",
+          title: "Новый запрос",
+          titleLabel: "Заголовок",
+          detailsLabel: "Описание",
+          skillsLabel: "Навыки (через запятую)",
+          cityLabel: "Город",
+          publish: "Опубликовать",
+          needLogin: "Нужно войти заново",
         }
       : {
-          title: "Help requests",
-          new: "Create request",
-          accept: "Accept",
-          openChat: "Open chat",
-          mine: "This is yours",
-          empty: "No open requests yet",
+          title: "New request",
+          titleLabel: "Title",
+          detailsLabel: "Details",
+          skillsLabel: "Skills (comma separated)",
+          cityLabel: "City",
+          publish: "Publish",
+          needLogin: "Please sign in again",
         };
   }, [lang]);
 
-  const [items, setItems] = useState<HelpRequest[]>([]);
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const me = auth.currentUser;
+  const [title, setTitle] = useState("");
+  const [details, setDetails] = useState("");
+  const [skills, setSkills] = useState("");
+  const [city, setCity] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    const unsub = listenOpenRequests(setItems, 100);
-    return () => unsub();
-  }, []);
+  async function onPublish() {
+    setMsg(null);
 
-  async function onAccept(r: HelpRequest) {
+    const me = auth.currentUser;
     if (!me) {
+      setMsg(t.needLogin);
       router.push(`/${lang}/auth`);
       return;
     }
-    if (!r.id) return;
-    if (r.ownerUid === me.uid) return;
 
-    setBusyId(r.id);
+    const safeTitle = title.trim();
+    const safeDetails = details.trim();
+
+    if (!safeTitle || !safeDetails) {
+      setMsg(lang === "ru" ? "Заполни заголовок и описание" : "Please fill title and details");
+      return;
+    }
+
+    setLoading(true);
     try {
-      await acceptRequest({ requestId: r.id, helperUid: me.uid });
+      const profile = await getUserProfile(me.uid);
 
-      // create chat and go
-      await getOrCreateChat(me.uid, r.ownerUid);
-      router.push(`/${lang}/chat/${r.ownerUid}`);
+      const id = await createRequest({
+        ownerUid: me.uid,
+        ownerName: profile?.name ?? me.email ?? null,
+        ownerCity: profile?.city ?? null,
+        title: safeTitle,
+        details: safeDetails,
+        skills: skills.split(",").map((s) => s.trim()).filter(Boolean),
+        city: (city || profile?.city || "").trim(),
+      });
+
+      router.push(`/${lang}/requests`);
     } catch (e: any) {
-      alert(e?.message ?? "Error");
+      setMsg(e?.message ?? "Error");
     } finally {
-      setBusyId(null);
+      setLoading(false);
     }
   }
 
   return (
     <Protected>
-      <main className="min-h-screen p-6">
-        <div className="flex items-center justify-between">
+      <main className="min-h-screen p-6 flex items-center justify-center">
+        <div className="w-full max-w-xl rounded-xl border p-6 bg-white">
           <h1 className="text-2xl font-bold">{t.title}</h1>
 
-          <Link
-            href={`/${lang}/requests/new`}
-            className="rounded-lg bg-black px-4 py-2 text-white"
-          >
-            {t.new}
-          </Link>
-        </div>
+          <div className="mt-4 grid gap-3">
+            <label className="grid gap-1">
+              <span className="text-sm">{t.titleLabel}</span>
+              <input className="rounded-lg border p-2" value={title} onChange={(e) => setTitle(e.target.value)} />
+            </label>
 
-        <div className="mt-6 grid gap-4">
-          {items.length === 0 && (
-            <div className="rounded-xl border bg-white p-4 text-sm">
-              {t.empty}
-            </div>
-          )}
+            <label className="grid gap-1">
+              <span className="text-sm">{t.detailsLabel}</span>
+              <textarea
+                className="rounded-lg border p-2 min-h-28"
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+              />
+            </label>
 
-          {items.map((r) => (
-            <div key={r.id} className="rounded-xl border bg-white p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="text-lg font-semibold">{r.title}</div>
-                  <div className="text-sm text-gray-600">
-                    {r.city || r.ownerCity || "—"} • {r.ownerName || r.ownerUid.slice(0, 6) + "…"}
-                  </div>
-                </div>
+            <label className="grid gap-1">
+              <span className="text-sm">{t.skillsLabel}</span>
+              <input className="rounded-lg border p-2" value={skills} onChange={(e) => setSkills(e.target.value)} />
+            </label>
 
-                <div className="flex gap-2">
-                  {me && r.ownerUid === me.uid ? (
-                    <div className="text-xs text-gray-500">{t.mine}</div>
-                  ) : (
-                    <button
-                      className="rounded-lg border px-3 py-2 text-sm disabled:opacity-60"
-                      disabled={busyId === r.id}
-                      onClick={() => onAccept(r)}
-                    >
-                      {t.accept}
-                    </button>
-                  )}
-                </div>
-              </div>
+            <label className="grid gap-1">
+              <span className="text-sm">{t.cityLabel}</span>
+              <input className="rounded-lg border p-2" value={city} onChange={(e) => setCity(e.target.value)} />
+            </label>
 
-              <p className="mt-3 text-sm text-gray-800 whitespace-pre-wrap">{r.details}</p>
+            <button
+              onClick={onPublish}
+              disabled={loading}
+              className="rounded-lg bg-black px-4 py-2 text-white disabled:opacity-60"
+            >
+              {t.publish}
+            </button>
 
-              <div className="mt-3 flex flex-wrap gap-2">
-                {(r.skills || []).slice(0, 12).map((s) => (
-                  <span key={s} className="rounded-full border px-2 py-1 text-xs">
-                    {s}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
+            {msg && <div className="rounded-lg border p-3 text-sm">{msg}</div>}
+          </div>
         </div>
       </main>
     </Protected>
