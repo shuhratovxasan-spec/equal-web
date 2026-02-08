@@ -1,34 +1,34 @@
 "use client";
 
+import { useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/useAuth";
 import { getUserProfile } from "@/lib/users";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 export default function RedirectGate() {
-  const { user, loading } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const lang = (params?.lang === "ru" ? "ru" : "en") as "ru" | "en";
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     if (loading) return;
 
+    // not logged in
     if (!user) {
-      router.replace(`/${lang}/auth`);
+      router.replace("/login");
       return;
     }
 
-    (async () => {
-      const profile = await getUserProfile(user.uid);
+    // optional: if route has uid param, check it exists
+    const uid = (params?.uid as string | undefined) ?? user.uid;
 
-      if (!profile || !profile.name) {
-        router.replace(`/${lang}/onboarding`);
-      } else {
-        router.replace(`/${lang}/users`);
+    (async () => {
+      const profile = await getUserProfile(uid);
+      if (!profile) {
+        router.replace("/onboarding");
       }
     })();
-  }, [user, loading, router, lang]);
+  }, [loading, user, params, router]);
 
-  return <div className="p-8">Loading...</div>;
+  return null;
 }
