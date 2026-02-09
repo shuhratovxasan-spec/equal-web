@@ -1,5 +1,4 @@
 "use client";
-import { getAuth } from "firebase/auth";
 
 import {
   signInWithEmailAndPassword,
@@ -83,4 +82,5 @@ export async function upsertUserProfile(data: any) {
   const ref = doc(db, "users", data.uid);
   await setDoc(ref, data, { merge: true });
 }
+
 
