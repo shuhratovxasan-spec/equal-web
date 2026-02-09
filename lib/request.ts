@@ -1,64 +1,45 @@
 // lib/request.ts
-import {
-  addDoc,
-  collection,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  serverTimestamp,
-  updateDoc,
-  where,
-  type Unsubscribe,
-} from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-export type HelpRequestStatus = "open" | "accepted" | "completed" | "cancelled";
+export type CreateRequestArgs = {
+  // keep requesterUid if some pages use it
+  requesterUid?: string;
 
-export type HelpRequest = {
-  id: string;
-  createdAt?: any;
-  status: HelpRequestStatus;
-  requesterUid: string;
-  helperUid?: string;
+  // your page is sending these:
+  ownerUid: string;
+  ownerName?: string | null;
+  ownerCity?: string | null;
+
   title?: string;
   details?: string;
+
+  // add more optional fields if you already store them
+  // category?: string | null;
+  // lang?: "en" | "ru";
 };
 
-const col = collection(db, "requests");
+export async function createRequest(args: CreateRequestArgs) {
+  const {
+    requesterUid,
+    ownerUid,
+    ownerName = null,
+    ownerCity = null,
+    title = "",
+    details = "",
+  } = args;
 
-export async function createRequest(args: {
-  requesterUid: string;
-  title?: string;
-  details?: string;
-}) {
-  await addDoc(col, {
-    status: "open",
-    requesterUid: args.requesterUid,
-    title: args.title ?? "",
-    details: args.details ?? "",
+  // back-compat: if requesterUid is used elsewhere, we keep it in doc
+  const docData = {
+    ownerUid,
+    ownerName,
+    ownerCity,
+    requesterUid: requesterUid ?? ownerUid,
+    title,
+    details,
     createdAt: serverTimestamp(),
-  });
-}
+  };
 
-export async function acceptRequest(args: { requestId: string; helperUid: string }) {
-  const ref = doc(db, "requests", args.requestId);
-  await updateDoc(ref, {
-    status: "accepted",
-    helperUid: args.helperUid,
-  });
-}
-
-export async function completeRequest(args: { requestId: string }) {
-  const ref = doc(db, "requests", args.requestId);
-  await updateDoc(ref, { status: "completed" });
-}
-
-// ✅ То, что ожидает твоя page.tsx
-export function listenOpenRequests(cb: (items: HelpRequest[]) => void): Unsubscribe {
-  const q = query(col, where("status", "==", "open"), orderBy("createdAt", "desc"));
-  return onSnapshot(q, (snap) => {
-    const items: HelpRequest[] = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
-    cb(items);
-  });
+  const ref = await addDoc(collection(db, "requests"), docData);
+  return ref.id;
 }
