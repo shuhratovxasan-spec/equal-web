@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase";
+
+import { auth } from "../../../lib/firebase";
 import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
@@ -13,10 +14,10 @@ import {
   signOut,
 } from "firebase/auth";
 
-import BackgroundShell from "@/components/BackgroundShell";
-import BackgroundPicker from "@/components/BackgroundPicker";
-import { BACKGROUNDS, BgId, DEFAULT_BG } from "@/lib/backgrounds";
-import { getLocalBg, setLocalBg, setUserBg } from "@/lib/userTheme";
+import BackgroundShell from "../../../components/BackgroundShell";
+import BackgroundPicker from "../../../components/BackgroundPicker";
+import { BACKGROUNDS, BgId, DEFAULT_BG } from "../../../lib/backgrounds";
+import { getLocalBg, setLocalBg, setUserBg } from "../../../lib/userTheme";
 
 type Mode = "email" | "phone";
 
@@ -65,18 +66,15 @@ export default function AuthPage() {
     setBgId(nextBg);
     setLocalBg(nextBg);
 
-    // если уже залогинен — сохраняем в профиль
     const uid = auth.currentUser?.uid;
     if (uid) {
       try {
         await setUserBg(uid, nextBg);
-      } catch {
-        // тихо, чтобы не ломать UX
-      }
+      } catch {}
     }
   }
 
-  // --- reCAPTCHA lifecycle (fix DUPE) ---
+  // --- reCAPTCHA lifecycle ---
   useEffect(() => {
     if (mode !== "phone") return;
     if (recaptchaRef.current) return;
@@ -104,7 +102,6 @@ export default function AuthPage() {
       const el = document.getElementById(recaptchaContainerId);
       if (el) el.innerHTML = "";
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
   async function doEmailSignIn() {
@@ -127,7 +124,6 @@ export default function AuthPage() {
     try {
       await createUserWithEmailAndPassword(auth, email.trim(), password);
 
-      // сохраняем выбранный фон сразу в users/{uid}
       const uid = auth.currentUser?.uid;
       if (uid) {
         try {
@@ -208,7 +204,6 @@ export default function AuthPage() {
       }
       await confirm.confirm(c);
 
-      // после phone login: записываем выбранный фон
       const uid = auth.currentUser?.uid;
       if (uid) {
         try {
@@ -261,7 +256,6 @@ export default function AuthPage() {
             ) : null}
           </div>
 
-          {/* theme picker */}
           <BackgroundPicker value={bgId} onChange={applyBg} />
 
           <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
@@ -307,13 +301,29 @@ export default function AuthPage() {
           </div>
 
           {msg ? (
-            <div style={{ marginTop: 12, padding: 10, background: "rgba(60,255,140,0.14)", border: "1px solid rgba(60,255,140,0.25)", borderRadius: 10 }}>
+            <div
+              style={{
+                marginTop: 12,
+                padding: 10,
+                background: "rgba(60,255,140,0.14)",
+                border: "1px solid rgba(60,255,140,0.25)",
+                borderRadius: 10,
+              }}
+            >
               {msg}
             </div>
           ) : null}
 
           {err ? (
-            <div style={{ marginTop: 12, padding: 10, background: "rgba(255,80,80,0.16)", border: "1px solid rgba(255,80,80,0.25)", borderRadius: 10 }}>
+            <div
+              style={{
+                marginTop: 12,
+                padding: 10,
+                background: "rgba(255,80,80,0.16)",
+                border: "1px solid rgba(255,80,80,0.25)",
+                borderRadius: 10,
+              }}
+            >
               {err}
             </div>
           ) : null}
@@ -325,7 +335,14 @@ export default function AuthPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@email.com"
-                style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.25)", background: "rgba(0,0,0,0.25)", color: "#fff" }}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  background: "rgba(0,0,0,0.25)",
+                  color: "#fff",
+                }}
                 disabled={busy}
               />
 
@@ -335,7 +352,14 @@ export default function AuthPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 type="password"
-                style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.25)", background: "rgba(0,0,0,0.25)", color: "#fff" }}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  background: "rgba(0,0,0,0.25)",
+                  color: "#fff",
+                }}
                 disabled={busy}
               />
 
@@ -352,9 +376,7 @@ export default function AuthPage() {
                 Forgot password
               </button>
 
-              <div style={{ marginTop: 10, fontSize: 12, opacity: 0.85 }}>
-                Password must be at least 6 characters.
-              </div>
+              <div style={{ marginTop: 10, fontSize: 12, opacity: 0.85 }}>Password must be at least 6 characters.</div>
             </div>
           ) : (
             <div style={{ marginTop: 16 }}>
@@ -363,7 +385,14 @@ export default function AuthPage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+1437..."
-                style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.25)", background: "rgba(0,0,0,0.25)", color: "#fff" }}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  background: "rgba(0,0,0,0.25)",
+                  color: "#fff",
+                }}
                 disabled={busy}
               />
 
@@ -380,7 +409,14 @@ export default function AuthPage() {
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                     placeholder="123456"
-                    style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.25)", background: "rgba(0,0,0,0.25)", color: "#fff" }}
+                    style={{
+                      width: "100%",
+                      padding: "10px 12px",
+                      borderRadius: 10,
+                      border: "1px solid rgba(255,255,255,0.25)",
+                      background: "rgba(0,0,0,0.25)",
+                      color: "#fff",
+                    }}
                     disabled={busy}
                   />
                   <button onClick={doVerifyCode} disabled={busy || code.trim().length < 4} style={{ width: "100%", marginTop: 12, padding: "10px 12px", borderRadius: 10 }}>

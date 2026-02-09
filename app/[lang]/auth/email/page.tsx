@@ -2,12 +2,9 @@
 
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
-import { auth } from "@/lib/firebase";
+
+import { auth } from "../../../../lib/firebase";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "firebase/auth";
 
 export default function EmailAuthPage() {
   const router = useRouter();
@@ -141,11 +138,10 @@ export default function EmailAuthPage() {
             Forgot password
           </button>
 
-          <div style={{ marginTop: 10, fontSize: 12, opacity: 0.7 }}>
-            Password must be at least 6 characters.
-          </div>
+          <div style={{ marginTop: 10, fontSize: 12, opacity: 0.7 }}>Password must be at least 6 characters.</div>
         </div>
       </div>
     </div>
   );
 }
+
